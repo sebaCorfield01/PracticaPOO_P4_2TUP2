@@ -10,24 +10,63 @@ public class BankAccountController : ControllerBase
     private static List<BankAccount> accounts = new List<BankAccount>();
 
     [HttpPost("create")]
-    public ActionResult<string> CreateBankAccount([FromQuery] string name, [FromQuery] decimal initialBalance)
+    public ActionResult<string> CreateBankAccount([FromQuery] string name, [FromQuery] decimal initialBalance, [FromQuery] AccountType accountType, [FromQuery] decimal? creditLimit = null, [FromQuery] decimal? monthlyDeposit = null)  
     {
         try
         {
             if (string.IsNullOrWhiteSpace(name))
-                return BadRequest("El nombre del propietario es obligatorio.");
+                return BadRequest("Owner name is required.");
 
-            var newAccount = new BankAccount(name, initialBalance);
+            BankAccount newAccount;
+
+            switch (accountType)
+            {
+                case AccountType.Credit:
+                    if (creditLimit == null)
+                        return BadRequest("Credit limit is required for a Line of Credit account.");
+                    newAccount = new LineOfCreditAccount(name, initialBalance, creditLimit.Value);
+                    break;
+
+                case AccountType.Gift:
+                    newAccount = new GiftCardAccount(name, initialBalance, monthlyDeposit ?? 0);
+                    break;
+
+                case AccountType.Interest:
+                    newAccount = new InterestEarningAccount(name, initialBalance);
+                    break;
+
+                default:
+                    return BadRequest("Invalid account type.");
+            }
 
             accounts.Add(newAccount);
 
-            return Ok($"Account {newAccount.Number} was created for {newAccount.Owner} with {newAccount.Balance} initial balance.");
+            return Ok($"Account {newAccount.Number} ({accountType}) was created for {newAccount.Owner} with {newAccount.Balance} initial balance.");
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+    [HttpPost("monthEnd")]
+    public ActionResult<string> PerformMonthEndForAccount([FromQuery] string accountNumber)
+    {
+        try
+        {
+            var account = accounts.FirstOrDefault(a => a.Number == accountNumber);
+            if (account == null)
+                return NotFound("Account not found.");
+
+            account.PerformMonthEndTransactions();
+            return Ok($"Month-end processing completed for account {account.Number}.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
 
     [HttpPost("deposit")]
     public ActionResult<string> MakeDeposit([FromQuery] decimal amount, [FromQuery] string note, [FromQuery] string accountNumber)

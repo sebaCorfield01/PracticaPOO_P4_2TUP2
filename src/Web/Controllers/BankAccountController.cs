@@ -125,6 +125,7 @@ public class BankAccountController : ControllerBase
             return StatusCode(500, $"Error interno del servidor: {ex.Message}");
         }
     }
+
     [HttpGet("accountHistory")]
     public IActionResult GetAccountHistory([FromQuery] string accountNumber)
     {
@@ -145,4 +146,52 @@ public class BankAccountController : ControllerBase
         }
     }
 
+    [HttpGet("accountInfo")]
+    public IActionResult GetAccountInfo([FromQuery] string accountNumber)
+    {
+        try
+        {
+            var account = accounts.FirstOrDefault(a => a.Number == accountNumber);
+            if (account == null)
+                return NotFound("Cuenta no encontrada.");
+
+            var accountInfo = new
+            {
+                account.Number,
+                account.Owner,
+                Balance = account.Balance
+            };
+
+            return Ok(accountInfo);
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+        }
+    }
+
+    [HttpGet("allAccountsInfo")]
+    public IActionResult GetAllAccountInfo()
+    {
+        try
+        {
+            if (!accounts.Any())
+                return NotFound("Cuenta no encontrada.");
+
+            var allInfo = accounts.Select(account => new
+            {
+                account.Number,
+                account.Owner,
+                Balance = account.Balance
+            });
+
+            return Ok(allInfo);
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+        }
+    }
 }

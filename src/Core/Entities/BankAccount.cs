@@ -4,7 +4,6 @@ public class BankAccount
 {
     // Campo estático: se comparte entre todas las instancias de BankAccount
     private static int s_accountNumberSeed = 1234567890;
-
     private List<Transaction> _allTransactions = new List<Transaction>();
 
     private readonly decimal _minimumBalance;

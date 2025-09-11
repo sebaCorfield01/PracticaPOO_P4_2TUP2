@@ -7,6 +7,11 @@ namespace Core.Entities
         {
         }
 
+        private LineOfCreditAccount()
+        {
+            
+        }
+        
         public override void PerformMonthEndTransactions()
         {
             if (Balance < 0)

@@ -7,6 +7,11 @@ namespace Core.Entities
         {
         }
 
+        private InterestEarningAccount()
+        {
+            
+        }
+
         public override void PerformMonthEndTransactions()
         {
             if (Balance > 500m)

@@ -12,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 /* Configuración de conexión con SQLite */
-var connection = new SqliteConnection("Data Source=WebApiBankAccount");
+var connection = new SqliteConnection("Data Source=WebApiBankAccount.db");
 connection.Open();
 
 using (var command = connection.CreateCommand())
@@ -21,7 +21,7 @@ using (var command = connection.CreateCommand())
     command.ExecuteNonQuery();
 }
 
-builder.Services.AddDbContext<ApplicationContext>(DbContextOptions => DbContextOptions.UseSqlite(connection));
+builder.Services.AddDbContext<ApplicationDbContext>(DbContextOptions => DbContextOptions.UseSqlite(connection));
 
 var app = builder.Build();
 

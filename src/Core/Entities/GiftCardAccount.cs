@@ -10,6 +10,11 @@ namespace Core.Entities
             _monthlyDeposit = monthlyDeposit;
         }
 
+        private GiftCardAccount() // private: asegura el encapsulamiento
+        {
+            
+        }
+
         public override void PerformMonthEndTransactions()
         {
             if (_monthlyDeposit != 0)

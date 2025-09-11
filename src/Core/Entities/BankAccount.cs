@@ -2,15 +2,25 @@ namespace Core.Entities;
 
 public class BankAccount
 {
+    public int Id { get; set; }
+
     // Campo estático: se comparte entre todas las instancias de BankAccount
     private static int s_accountNumberSeed = 1234567890;
+
     private List<Transaction> _allTransactions = new List<Transaction>();
+    public IReadOnlyCollection<Transaction> Transactions => _allTransactions;
 
     private readonly decimal _minimumBalance;
 
     // Campo de instancia: cada cuenta tiene su propio saldo
-    public string Number { get; }
+    public string Number { get; set; }
     public string Owner { get; set; }
+
+    protected BankAccount() // protected: visibilidad a las clases hijas
+    {
+        
+    }
+
     public decimal Balance
     {
         get

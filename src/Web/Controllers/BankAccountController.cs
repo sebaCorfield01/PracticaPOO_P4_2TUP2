@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Core.Entities;
+using Infrastructure.Data;
 
 namespace Web.Controllers;
 
@@ -8,6 +9,12 @@ namespace Web.Controllers;
 public class BankAccountController : ControllerBase
 {
     private static List<BankAccount> accounts = new List<BankAccount>();
+    private readonly ApplicationDbContext _context;
+
+    public BankAccountController(ApplicationDbContext applicationDbContext)
+    {
+        _context = applicationDbContext;
+    }
 
     [HttpPost("create")]
     public ActionResult<BankAccount> CreateBankAccount([FromQuery] string name, [FromQuery] decimal initialBalance, [FromQuery] AccountType accountType, [FromQuery] decimal? creditLimit = null, [FromQuery] decimal? monthlyDeposit = null)  
@@ -39,7 +46,9 @@ public class BankAccountController : ControllerBase
                     return BadRequest("Invalid account type.");
             }
 
-            accounts.Add(newAccount);
+            // accounts.Add(newAccount);
+            _context.bankAccounts.Add(newAccount);
+            _context.SaveChanges();
 
         return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, newAccount);
         }

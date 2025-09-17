@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Core.Entities;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web.Controllers;
 
@@ -17,7 +18,7 @@ public class BankAccountController : ControllerBase
     }
 
     [HttpPost("create")]
-    public ActionResult<BankAccount> CreateBankAccount([FromQuery] string name, [FromQuery] decimal initialBalance, [FromQuery] AccountType accountType, [FromQuery] decimal? creditLimit = null, [FromQuery] decimal? monthlyDeposit = null)  
+    public ActionResult<BankAccount> CreateBankAccount([FromQuery] string name, [FromQuery] decimal initialBalance, [FromQuery] AccountType accountType, [FromQuery] decimal? creditLimit = null, [FromQuery] decimal? monthlyDeposit = null)
     {
         try
         {
@@ -50,7 +51,7 @@ public class BankAccountController : ControllerBase
             _context.bankAccounts.Add(newAccount);
             _context.SaveChanges();
 
-        return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, newAccount);
+            return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, newAccount);
         }
         catch (Exception ex)
         {
@@ -63,7 +64,7 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            var account = accounts.FirstOrDefault(a => a.Number == accountNumber);
+            var account = _context.bankAccounts.FirstOrDefault(a => a.Number == accountNumber);
             if (account == null)
                 return NotFound("Account not found.");
 
@@ -76,13 +77,12 @@ public class BankAccountController : ControllerBase
         }
     }
 
-
     [HttpPost("deposit")]
     public ActionResult<string> MakeDeposit([FromQuery] decimal amount, [FromQuery] string note, [FromQuery] string accountNumber)
     {
         try
         {
-            var account = accounts.FirstOrDefault(a => a.Number == accountNumber);
+            var account = _context.bankAccounts.FirstOrDefault(a => a.Number == accountNumber);
 
             if (account == null)
                 return NotFound("Cuenta no encontrada.");
@@ -122,7 +122,7 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            var account = _context.bankAccounts.FirstOrDefault(a => a.Number == accountNumber);
+            var account = _context.bankAccounts.Include(x => x.Transactions).FirstOrDefault(a => a.Number == accountNumber);
 
             if (account == null)
                 return NotFound("Cuenta no encontrada.");

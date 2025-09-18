@@ -3,6 +3,7 @@ using Core.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Core.Interfaces;
+using System.Linq.Expressions;
 
 namespace Web.Controllers;
 
@@ -87,6 +88,8 @@ public class BankAccountController : ControllerBase
                 return NotFound("Cuenta no encontrada.");
 
             account.MakeDeposit(amount, DateTime.Now, note);
+
+            _bankAccountRepository.Update(account);
 
             return Ok($"A deposit of ${amount} was made in account {account.Number}.");
         }
@@ -185,7 +188,6 @@ public class BankAccountController : ControllerBase
         try
         {
             var list = _bankAccountRepository.List();
-
             return Ok(list);
         }
         catch (Exception ex)

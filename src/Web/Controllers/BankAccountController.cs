@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Core.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Core.Interfaces;
 
 namespace Web.Controllers;
 
@@ -9,12 +10,11 @@ namespace Web.Controllers;
 [Route("[controller]")]
 public class BankAccountController : ControllerBase
 {
-    // private static List<BankAccount> accounts = new List<BankAccount>();
-    private readonly ApplicationDbContext _context;
+    private readonly IBankAccountRepository _bankAccountRepository;
 
-    public BankAccountController(ApplicationDbContext applicationDbContext)
+    public BankAccountController(IBankAccountRepository bankAccountRepository)
     {
-        _context = applicationDbContext;
+        _bankAccountRepository = bankAccountRepository;
     }
 
     [HttpPost("create")]
@@ -48,8 +48,7 @@ public class BankAccountController : ControllerBase
             }
 
             // accounts.Add(newAccount);
-            _context.bankAccounts.Add(newAccount);
-            _context.SaveChanges();
+            _bankAccountRepository.Add(newAccount);
 
             return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, newAccount);
         }
@@ -64,7 +63,7 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            var account = _context.bankAccounts.FirstOrDefault(a => a.Number == accountNumber);
+            var account = _bankAccountRepository.GetByAccountNumber(accountNumber);
             if (account == null)
                 return NotFound("Account not found.");
 
@@ -82,7 +81,7 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            var account = _context.bankAccounts.FirstOrDefault(a => a.Number == accountNumber);
+            var account = _bankAccountRepository.GetByAccountNumber(accountNumber);
 
             if (account == null)
                 return NotFound("Cuenta no encontrada.");
@@ -102,7 +101,7 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            var account = _context.bankAccounts.FirstOrDefault(a => a.Number == accountNumber);
+            var account = _bankAccountRepository.GetByAccountNumber(accountNumber);
 
             if (account == null)
                 return NotFound("Cuenta no encontrada.");
@@ -122,7 +121,7 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            var account = _context.bankAccounts.Include(x => x.Transactions).FirstOrDefault(a => a.Number == accountNumber);
+            var account = _bankAccountRepository.GetByAccountNumber(accountNumber);
 
             if (account == null)
                 return NotFound("Cuenta no encontrada.");
@@ -140,7 +139,7 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            var account = _context.bankAccounts.FirstOrDefault(a => a.Number == accountNumber);
+            var account = _bankAccountRepository.GetByAccountNumber(accountNumber);
 
             if (account == null)
                 return NotFound("Cuenta no encontrada.");
@@ -160,7 +159,7 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            var account = _context.bankAccounts.FirstOrDefault(a => a.Number == accountNumber);
+            var account = _bankAccountRepository.GetByAccountNumber(accountNumber);
             if (account == null)
                 return NotFound("Cuenta no encontrada.");
 
@@ -185,17 +184,9 @@ public class BankAccountController : ControllerBase
     {
         try
         {
-            if (!_context.bankAccounts.Any())
-                return Ok(Enumerable.Empty<BankAccount>());
+            var list = _bankAccountRepository.List();
 
-            var allInfo = _context.bankAccounts.Select(account => new
-            {
-                account.Number,
-                account.Owner,
-                Balance = account.Balance
-            });
-
-            return Ok(allInfo);
+            return Ok(list);
         }
         catch (Exception ex)
         {

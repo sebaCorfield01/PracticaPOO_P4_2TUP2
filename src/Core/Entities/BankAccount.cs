@@ -4,9 +4,6 @@ public class BankAccount
 {
     public int Id { get; set; }
 
-    // Campo estático: se comparte entre todas las instancias de BankAccount
-    private static int s_accountNumberSeed = 1234567890;
-
     private List<Transaction> _allTransactions = new List<Transaction>();
     public IReadOnlyCollection<Transaction> Transactions => _allTransactions;
 
@@ -39,8 +36,7 @@ public class BankAccount
 
     public BankAccount(string name, decimal initialBalance, decimal minimumBalance)
     {
-        Number = s_accountNumberSeed.ToString();
-        s_accountNumberSeed++;
+        Number = Guid.NewGuid().ToString();
 
         Owner = name;
         _minimumBalance = minimumBalance;

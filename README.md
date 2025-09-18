@@ -24,6 +24,16 @@ $ dotnet add src/Infrastructure/Infrastructure.csproj reference src/Core/Core.cs
 
 
 # Entity Framework
+## Install Entity framework libraries
+On Web project
+dotnet add package Microsoft.EntityFrameworkCore.Design
+
+On Infrastructure project
+dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+
+## Install dotnet ef command line tool
+dotnet tool update --global dotnet-ef
+
 ## Create migrations
 dotnet ef migrations add InitialMigration --context ApplicationContext --startup-project src/Web --project src/Infrastructure -o Data/Migrations
 

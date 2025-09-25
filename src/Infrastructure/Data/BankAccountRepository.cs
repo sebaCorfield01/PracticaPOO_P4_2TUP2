@@ -31,13 +31,15 @@ public class BankAccountRepository : IBankAccountRepository
     {
         return _applicationDbContext
         .bankAccounts
-        //.Include(x => x.Transactions)
+        .Include(x => x.Transactions)
         .FirstOrDefault(a => a.Number == accountNumber);
     }
 
     public BankAccount? GetById(int id)
     {
-        return _applicationDbContext.bankAccounts.FirstOrDefault(a => a.Id == id);
+        return _applicationDbContext.bankAccounts
+        .Include(x => x.Transactions)
+        .FirstOrDefault(a => a.Id == id);
     }
 
     public List<BankAccount> List()

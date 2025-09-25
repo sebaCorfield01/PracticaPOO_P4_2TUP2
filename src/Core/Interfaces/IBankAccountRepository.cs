@@ -11,6 +11,8 @@ public interface IBankAccountRepository
 
     List<BankAccount> List();
 
+    List<BankAccount> ListWithTransaction();
+
     BankAccount Add(BankAccount entity);
 
     BankAccount Update(BankAccount entity);

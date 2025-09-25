@@ -42,6 +42,10 @@ public class BankAccountRepository : IBankAccountRepository
     {
         return _applicationDbContext.bankAccounts.ToList();
     }
+    public List<BankAccount> ListWithTransaction()
+    {
+        return _applicationDbContext.bankAccounts.Include(x => x.Transactions).ToList();
+    }
 
     public BankAccount Update(BankAccount entity)
     {

@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Core.Interfaces;
 using System.Linq.Expressions;
+using Web.Models;
 
 namespace Web.Controllers;
 
@@ -48,7 +49,6 @@ public class BankAccountController : ControllerBase
                     return BadRequest("Invalid account type.");
             }
 
-            // accounts.Add(newAccount);
             _bankAccountRepository.Add(newAccount);
 
             return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, newAccount);
@@ -158,7 +158,7 @@ public class BankAccountController : ControllerBase
     }
 
     [HttpGet("accountInfo")]
-    public IActionResult GetAccountInfo([FromQuery] string accountNumber)
+    public ActionResult<BankAccountDto> GetAccountInfo([FromQuery] string accountNumber)
     {
         try
         {
@@ -166,14 +166,7 @@ public class BankAccountController : ControllerBase
             if (account == null)
                 return NotFound("Cuenta no encontrada.");
 
-            var accountInfo = new
-            {
-                account.Number,
-                account.Owner,
-                Balance = account.Balance
-            };
-
-            return Ok(accountInfo);
+            return BankAccountDto.Create(account);
         }
         catch (Exception ex)
         {
@@ -183,12 +176,13 @@ public class BankAccountController : ControllerBase
     }
 
     [HttpGet("allAccountsInfo")]
-    public IActionResult GetAllAccountInfo()
+    public ActionResult<List<BankAccountDto>> GetAllAccountInfo()
     {
         try
         {
-            var list = _bankAccountRepository.List();
-            return Ok(list);
+            var list = _bankAccountRepository.ListWithTransaction();
+
+            return BankAccountDto.Create(list);
         }
         catch (Exception ex)
         {

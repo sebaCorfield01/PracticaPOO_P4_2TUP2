@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using Core.Entities;
 using Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,8 @@ public class BankAccountRepository : IBankAccountRepository
     public BankAccount? GetByAccountNumber(string accountNumber)
     {
         return _applicationDbContext
-        .bankAccounts.Include(x => x.Transactions)
+        .bankAccounts
+        //.Include(x => x.Transactions)
         .FirstOrDefault(a => a.Number == accountNumber);
     }
 
@@ -40,11 +42,14 @@ public class BankAccountRepository : IBankAccountRepository
 
     public List<BankAccount> List()
     {
-        return _applicationDbContext.bankAccounts.ToList();
+        return _applicationDbContext.bankAccounts
+        .ToList();
     }
     public List<BankAccount> ListWithTransaction()
     {
-        return _applicationDbContext.bankAccounts.Include(x => x.Transactions).ToList();
+        return _applicationDbContext.bankAccounts
+        .Include(x => x.Transactions)
+        .ToList();
     }
 
     public BankAccount Update(BankAccount entity)

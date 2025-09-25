@@ -93,6 +93,10 @@ public class BankAccountController : ControllerBase
 
             return Ok($"A deposit of ${amount} was made in account {account.Number}.");
         }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            return StatusCode(400, $"Client error: {ex.Message}");
+        }
         catch (Exception ex)
         {
             return StatusCode(500, $"Error interno del servidor: {ex.Message}");

@@ -61,11 +61,16 @@ public class BankAccount
 
     public void MakeWithdrawal(decimal amount, DateTime date, string note)
     {
+        if (amount > Balance)
+        {
+            throw new AppValidationException(
+            $"No es posible realizar una extracción de ${amount} ya que el balance de la cuenta es de ${Balance}.");
+        }
 
         if (amount > _withDrawalLimit)
         {
             throw new AppValidationException(
-            $"El monto {amount} excede el límite de extracción.", "400");
+            $"El monto {amount} excede el límite de extracción.");
         }
 
 

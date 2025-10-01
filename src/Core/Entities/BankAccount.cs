@@ -1,3 +1,5 @@
+using Core.Exceptions;
+
 namespace Core.Entities;
 
 public class BankAccount
@@ -17,7 +19,7 @@ public class BankAccount
 
     protected BankAccount() // protected: visibilidad a las clases hijas
     {
-        
+
     }
 
     public decimal Balance
@@ -59,15 +61,18 @@ public class BankAccount
 
     public void MakeWithdrawal(decimal amount, DateTime date, string note)
     {
-        
-        //TO-DO
-        //if (amount > _withDrawalLimit)
+
+        if (amount > _withDrawalLimit)
+        {
+            throw new AppValidationException(
+            $"El monto {amount} excede el límite de extracción.", "400");
+        }
 
 
         if (amount <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(amount), "Amount of withdrawal must be positive");
-            }
+        {
+            throw new ArgumentOutOfRangeException(nameof(amount), "Amount of withdrawal must be positive");
+        }
         Transaction? overdraftTransaction = CheckWithdrawalLimit(Balance - amount < _minimumBalance);
         Transaction? withdrawal = new(-amount, date, note);
         _allTransactions.Add(withdrawal);

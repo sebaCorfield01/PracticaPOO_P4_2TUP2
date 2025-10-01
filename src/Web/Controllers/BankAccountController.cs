@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Core.Interfaces;
 using System.Linq.Expressions;
 using Web.Models;
+using Core.Exceptions;
 
 namespace Web.Controllers;
 
@@ -116,6 +117,10 @@ public class BankAccountController : ControllerBase
             account.MakeWithdrawal(amount, DateTime.Now, note);
 
             return Ok($"A withdrawal of ${amount} was made in account {account.Number}.");
+        }
+        catch (AppValidationException ex)
+        {
+            return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {

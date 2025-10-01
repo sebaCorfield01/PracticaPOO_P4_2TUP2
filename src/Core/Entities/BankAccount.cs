@@ -9,6 +9,8 @@ public class BankAccount
 
     private readonly decimal _minimumBalance;
 
+    private readonly decimal _withDrawalLimit = 100000;
+
     // Campo de instancia: cada cuenta tiene su propio saldo
     public string Number { get; set; }
     public string Owner { get; set; }
@@ -57,10 +59,15 @@ public class BankAccount
 
     public void MakeWithdrawal(decimal amount, DateTime date, string note)
     {
+        
+        //TO-DO
+        //if (amount > _withDrawalLimit)
+
+
         if (amount <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(amount), "Amount of withdrawal must be positive");
-        }
+            {
+                throw new ArgumentOutOfRangeException(nameof(amount), "Amount of withdrawal must be positive");
+            }
         Transaction? overdraftTransaction = CheckWithdrawalLimit(Balance - amount < _minimumBalance);
         Transaction? withdrawal = new(-amount, date, note);
         _allTransactions.Add(withdrawal);

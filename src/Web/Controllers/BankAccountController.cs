@@ -107,10 +107,8 @@ public class BankAccountController : ControllerBase
     [HttpPost("withdrawal")]
     public ActionResult<string> MakeWithdrawal([FromQuery] decimal amount, [FromQuery] string note, [FromQuery] string accountNumber)
     {
-        var account = _bankAccountRepository.GetByAccountNumber(accountNumber);
-        
-        if (account == null)
-            throw new AppValidationException("Cuenta no encontrada.", "404");
+        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
+            ?? throw new AppValidationException("Cuenta no encontrada.");
 
         account.MakeWithdrawal(amount, DateTime.Now, note);
         _bankAccountRepository.Update(account);

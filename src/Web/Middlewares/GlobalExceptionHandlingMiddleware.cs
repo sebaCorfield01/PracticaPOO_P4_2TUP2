@@ -1,19 +1,33 @@
+using Core.Exceptions;
+using Microsoft.AspNetCore.Http.HttpResults;
+
 namespace Web.Middleware;
 
 public class GlobalExceptionHandlingMiddleware : IMiddleware
+{
+    private readonly ILogger<GlobalExceptionHandlingMiddleware> _logger;
+    public GlobalExceptionHandlingMiddleware(
+        ILogger<GlobalExceptionHandlingMiddleware> logger)
     {
-        private readonly ILogger<GlobalExceptionHandlingMiddleware> _logger;
-        public GlobalExceptionHandlingMiddleware(
-            ILogger<GlobalExceptionHandlingMiddleware> logger)
-        {
-            _logger = logger;
-        }
+        _logger = logger;
+    }
 
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        Console.WriteLine("Hola, yendo para rutear");
-        await next(context);
-        Console.WriteLine("Hola, volviendo para responder");
+        try
+        {
+            await next(context);
+        }
+        catch (AppValidationException ex)
+        {
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsync($"¡Oops! Algo pasó: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync($"¡Oops! Error interno del servidor: {ex.Message}");
+        }
     }
-    }
+}

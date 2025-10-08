@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using Web.Models;
 using Core.Exceptions;
 using Web.Models.Requests;
+using Core.Services;
 
 namespace Web.Controllers;
 
@@ -15,35 +16,23 @@ namespace Web.Controllers;
 public class BankAccountController : ControllerBase
 {
     private readonly IBankAccountRepository _bankAccountRepository;
+    private readonly BankAccountService _bankAccountService;
 
-    public BankAccountController(IBankAccountRepository bankAccountRepository)
+    public BankAccountController(IBankAccountRepository bankAccountRepository, BankAccountService bankAccountService )
     {
+        _bankAccountService = bankAccountService;
         _bankAccountRepository = bankAccountRepository;
     }
 
     [HttpPost("create")]
     public IActionResult CreateBankAccount([FromBody] CreateBankAccountRequest bankAccountDto)
     {
-        BankAccount newAccount;
+       var newAccount =  _bankAccountService.CreateBankAccount(bankAccountDto.Name
+        , bankAccountDto.InitialBalance
+        , bankAccountDto.AccountType
+        , bankAccountDto.CreditLimit
+        , bankAccountDto.MonthlyDeposit);
 
-        switch (bankAccountDto.AccountType)
-        {
-            case AccountType.Credit:
-                if (bankAccountDto.CreditLimit == null)
-                    return BadRequest("Credit limit is required for a Line of Credit account.");
-                newAccount = new LineOfCreditAccount(bankAccountDto.Name, bankAccountDto.InitialBalance, bankAccountDto.CreditLimit.Value);
-                break;
-            case AccountType.Gift:
-                newAccount = new GiftCardAccount(bankAccountDto.Name, bankAccountDto.InitialBalance, bankAccountDto.MonthlyDeposit ?? 0);
-                break;
-            case AccountType.Interest:
-                newAccount = new InterestEarningAccount(bankAccountDto.Name, bankAccountDto.InitialBalance);
-                break;
-            default:
-                return BadRequest("Invalid account type.");
-        }
-
-        _bankAccountRepository.Add(newAccount);
         return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, BankAccountDto.Create(newAccount));
     }
 

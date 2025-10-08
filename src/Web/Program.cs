@@ -1,4 +1,5 @@
 using Core.Interfaces;
+using Core.Services;
 using Infrastructure.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IBankAccountRepository, BankAccountRepository>();
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
+builder.Services.AddScoped<BankAccountService>();
 
 /* Configuración de conexión con SQLite */
 var connection = new SqliteConnection("Data Source=WebApiBankAccount.db");

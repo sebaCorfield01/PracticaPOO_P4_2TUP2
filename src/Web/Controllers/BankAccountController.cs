@@ -22,7 +22,7 @@ public class BankAccountController : ControllerBase
     }
 
     [HttpPost("create")]
-    public ActionResult<BankAccount> CreateBankAccount([FromBody] CreateBankAccountRequest bankAccountDto)
+    public IActionResult CreateBankAccount([FromBody] CreateBankAccountRequest bankAccountDto)
     {
         BankAccount newAccount;
 
@@ -44,7 +44,7 @@ public class BankAccountController : ControllerBase
         }
 
         _bankAccountRepository.Add(newAccount);
-        return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, newAccount);
+        return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, BankAccountDto.Create(newAccount));
     }
 
     [HttpPost("monthEnd")]

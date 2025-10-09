@@ -47,15 +47,15 @@ public class BankAccountController : ControllerBase
     }
 
     [HttpPost("deposit")]
-    public ActionResult<string> MakeDeposit([FromQuery] decimal amount, [FromQuery] string note, [FromQuery] string accountNumber)
+    public ActionResult<string> MakeDeposit([FromBody] MakeDepositRequest depositDto )
     {
-        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
-            ?? throw new AppValidationException("Cuenta no encontrada.");
 
-        account.MakeDeposit(amount, DateTime.Now, note);
-        _bankAccountRepository.Update(account);
-
-        return Ok($"A deposit of ${amount} was made in account {account.Number}.");
+        var depositedAmount  = _bankAccountService.MakeDeposit(
+            depositDto.Amount,
+            depositDto.Note,
+            depositDto.Number
+        );
+        return Ok(depositedAmount);
     }
 
     [HttpPost("withdrawal")]
@@ -74,10 +74,8 @@ public class BankAccountController : ControllerBase
     [HttpGet("balance")]
     public ActionResult<string> GetBalance([FromQuery] string accountNumber)
     {
-        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
-            ?? throw new AppValidationException("Cuenta no encontrada.");
-
-        return Ok($"The balance in account {account.Number} is ${account.Balance}.");
+        var balance = _bankAccountService.GetBalance(accountNumber);
+        return Ok(balance);
 
     }
 

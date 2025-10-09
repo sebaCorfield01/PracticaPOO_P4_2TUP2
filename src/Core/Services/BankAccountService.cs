@@ -41,6 +41,25 @@ public class BankAccountService
 
         _bankAccountRepository.Add(newAccount);
 
-        return newAccount; 
+        return newAccount;
+    }
+
+    public decimal GetBalance(string accountNumber)
+    {
+        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
+        ?? throw new AppValidationException("Cuenta no encontrada.");
+
+        return account.Balance;
+    }
+
+    public decimal MakeDeposit(decimal amount, string note, string accountNumber)
+    {
+        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
+            ?? throw new AppValidationException("Cuenta no encontrada.");
+
+        account.MakeDeposit(amount, DateTime.Now, note);
+        _bankAccountRepository.Update(account);
+
+        return amount;
     }
 }

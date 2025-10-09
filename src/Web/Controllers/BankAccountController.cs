@@ -74,10 +74,8 @@ public class BankAccountController : ControllerBase
     [HttpGet("balance")]
     public ActionResult<string> GetBalance([FromQuery] string accountNumber)
     {
-        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
-            ?? throw new AppValidationException("Cuenta no encontrada.");
-
-        return Ok($"The balance in account {account.Number} is ${account.Balance}.");
+        var balance = _bankAccountService.GetBalance(accountNumber);
+        return Ok($"The balance in account {accountNumber} is ${balance}.");
 
     }
 

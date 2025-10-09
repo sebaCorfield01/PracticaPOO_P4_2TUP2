@@ -18,7 +18,7 @@ public class BankAccountController : ControllerBase
     private readonly IBankAccountRepository _bankAccountRepository;
     private readonly BankAccountService _bankAccountService;
 
-    public BankAccountController(IBankAccountRepository bankAccountRepository, BankAccountService bankAccountService )
+    public BankAccountController(IBankAccountRepository bankAccountRepository, BankAccountService bankAccountService)
     {
         _bankAccountService = bankAccountService;
         _bankAccountRepository = bankAccountRepository;
@@ -27,11 +27,11 @@ public class BankAccountController : ControllerBase
     [HttpPost("create")]
     public IActionResult CreateBankAccount([FromBody] CreateBankAccountRequest bankAccountDto)
     {
-       var newAccount =  _bankAccountService.CreateBankAccount(bankAccountDto.Name
-        , bankAccountDto.InitialBalance
-        , bankAccountDto.AccountType
-        , bankAccountDto.CreditLimit
-        , bankAccountDto.MonthlyDeposit);
+        var newAccount = _bankAccountService.CreateBankAccount(bankAccountDto.Name
+         , bankAccountDto.InitialBalance
+         , bankAccountDto.AccountType
+         , bankAccountDto.CreditLimit
+         , bankAccountDto.MonthlyDeposit);
 
         return CreatedAtAction(nameof(GetAccountInfo), new { accountNumber = newAccount.Number }, BankAccountDto.Create(newAccount));
     }
@@ -47,10 +47,10 @@ public class BankAccountController : ControllerBase
     }
 
     [HttpPost("deposit")]
-    public ActionResult<string> MakeDeposit([FromBody] MakeDepositRequest depositDto )
+    public ActionResult<string> MakeDeposit([FromBody] MakeDepositRequest depositDto)
     {
 
-        var depositedAmount  = _bankAccountService.MakeDeposit(
+        var depositedAmount = _bankAccountService.MakeDeposit(
             depositDto.Amount,
             depositDto.Note,
             depositDto.Number
@@ -93,8 +93,7 @@ public class BankAccountController : ControllerBase
     [HttpGet("accountInfo")]
     public ActionResult<BankAccountDto> GetAccountInfo([FromQuery] string accountNumber)
     {
-        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
-            ?? throw new AppValidationException("Cuenta no encontrada.");
+        var account = _bankAccountService.GetAccountInfo(accountNumber);
 
         return BankAccountDto.Create(account);
     }
@@ -102,7 +101,7 @@ public class BankAccountController : ControllerBase
     [HttpGet("allAccountsInfo")]
     public ActionResult<List<BankAccountDto>> GetAllAccountInfo()
     {
-        var list = _bankAccountRepository.ListWithTransaction();
+        var list = _bankAccountService.GetAllAccountsInfo();
         return BankAccountDto.Create(list);
     }
 }

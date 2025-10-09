@@ -62,4 +62,17 @@ public class BankAccountService
 
         return amount;
     }
+
+    public BankAccount GetAccountInfo(string accountNumber)
+    {
+        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
+                ?? throw new AppValidationException("Cuenta no encontrada.");
+        return account;
+    }
+
+    public List<BankAccount> GetAllAccountsInfo()
+    {
+        return _bankAccountRepository.ListWithTransaction();
+    }
+
 }

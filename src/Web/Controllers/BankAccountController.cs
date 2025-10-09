@@ -75,7 +75,7 @@ public class BankAccountController : ControllerBase
     public ActionResult<string> GetBalance([FromQuery] string accountNumber)
     {
         var balance = _bankAccountService.GetBalance(accountNumber);
-        return Ok($"The balance in account {accountNumber} is ${balance}.");
+        return Ok(balance);
 
     }
 

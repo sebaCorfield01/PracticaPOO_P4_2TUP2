@@ -5,20 +5,22 @@ public class Transaction
     public int Id { get; set; }
     public decimal Amount { get; private set; }
     public DateTime Date { get; private set; }
-    public string Notes { get; private set; }
-
-    /* Foreign Key a Bank Account */
+    public string? Notes { get; private set; }
     
+   /*foreing key BankAccount*/
+    
+   public BankAccount? BankAccount { get; private set; } /* nullable reference type */
 
     private Transaction()
     {
 
     }
 
-    public Transaction(decimal amount, DateTime date, string note)
+    public Transaction(decimal amount, DateTime date, string notes)
     {
         Amount = amount;
         Date = date;
-        Notes = note;
+        Notes = notes;
+        
     }
 }

@@ -7,7 +7,7 @@ public record MakeDepositRequest(
     decimal Amount,
 
     [Required]
-    string Note,
+    string Notes,
 
     [Required]
     string Number

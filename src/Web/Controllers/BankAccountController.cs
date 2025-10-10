@@ -15,13 +15,13 @@ namespace Web.Controllers;
 [Route("[controller]")]
 public class BankAccountController : ControllerBase
 {
-    private readonly IBankAccountRepository _bankAccountRepository;
+   
     private readonly BankAccountService _bankAccountService;
 
-    public BankAccountController(IBankAccountRepository bankAccountRepository, BankAccountService bankAccountService)
+    public BankAccountController(BankAccountService bankAccountService)
     {
         _bankAccountService = bankAccountService;
-        _bankAccountRepository = bankAccountRepository;
+       
     }
 
     [HttpPost("create")]
@@ -39,36 +39,32 @@ public class BankAccountController : ControllerBase
     [HttpPost("monthEnd")]
     public ActionResult<string> PerformMonthEndForAccount([FromQuery] string accountNumber)
     {
-        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
-            ?? throw new AppValidationException("Cuenta no encontrada.");
-
-        account.PerformMonthEndTransactions();
-        return Ok($"Month-end processing completed for account {account.Number}.");
+          _bankAccountService.PerformMonthEndForAccount(accountNumber);
+        return NoContent();
     }
 
     [HttpPost("deposit")]
     public ActionResult<string> MakeDeposit([FromBody] MakeDepositRequest depositDto)
     {
 
-        var depositedAmount = _bankAccountService.MakeDeposit(
-            depositDto.Amount,
-            depositDto.Note,
-            depositDto.Number
-        );
-        return Ok(depositedAmount);
+         _bankAccountService.MakeDeposit(
+                    depositDto.Amount,
+                    depositDto.Note,
+                    depositDto.Number
+                );
+        return NoContent();
     }
 
     [HttpPost("withdrawal")]
-    public ActionResult<string> MakeWithdrawal([FromQuery] decimal amount, [FromQuery] string note, [FromQuery] string accountNumber)
+    
+     public ActionResult<string> MakeWithdrawal([FromBody] MakeWithdrawalRequest withdrawalDto)
     {
-        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
-            ?? throw new AppValidationException("Cuenta no encontrada.");
-
-        account.MakeWithdrawal(amount, DateTime.Now, note);
-        _bankAccountRepository.Update(account);
-
-
-        return Ok($"A withdrawal of ${amount} was made in account {account.Number}.");
+            _bankAccountService.MakeWithdrawal(
+                        withdrawalDto.Amount,
+                        withdrawalDto.Note,
+                        withdrawalDto.Number
+                    );
+            return NoContent();
     }
 
     [HttpGet("balance")]
@@ -80,15 +76,14 @@ public class BankAccountController : ControllerBase
     }
 
     [HttpGet("accountHistory")]
-    public IActionResult GetAccountHistory([FromQuery] string accountNumber)
+      public IActionResult GetAccountHistory([FromQuery] string accountNumber)
     {
-        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
-            ?? throw new AppValidationException("Cuenta no encontrada.");
-
-        var history = account.GetAccountHistory();
-
+        var history = _bankAccountService.GetAccountHistory(accountNumber);
+        if (history == null || !history.Any())
+        return NoContent();
         return Ok(history);
     }
+ 
 
     [HttpGet("accountInfo")]
     public ActionResult<BankAccountDto> GetAccountInfo([FromQuery] string accountNumber)

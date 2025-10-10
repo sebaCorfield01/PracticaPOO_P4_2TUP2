@@ -1,7 +1,7 @@
 using Core.Entities;
 using Core.Exceptions;
 using Core.Interfaces;
-
+using Core.Dtos;
 namespace Core.Services;
 
 public class BankAccountService
@@ -75,4 +75,38 @@ public class BankAccountService
         return _bankAccountRepository.ListWithTransaction();
     }
 
+
+
+    public void MakeWithdrawal(decimal amount, string note, string accountNumber)
+    {
+        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
+            ?? throw new AppValidationException("Cuenta no encontrada.");
+
+        account.MakeWithdrawal(amount, DateTime.Now, note);
+        _bankAccountRepository.Update(account);
+    }
+
+public List<TransactionDto> GetAccountHistory(string accountNumber)
+{
+    // Traemos la cuenta por número
+    var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
+        ?? throw new AppValidationException("Cuenta no encontrada.");
+
+    // Obtenemos sus transacciones usando la propiedad de navegación
+    var transactions = account.Transactions
+        .OrderByDescending(t => t.Date)
+        .ToList();
+
+    // Mapear a DTO
+    return TransactionDto.Create(transactions);
+}
+    public void PerformMonthEndForAccount(string accountNumber)
+    {
+        var account = _bankAccountRepository.GetByAccountNumber(accountNumber)
+            ?? throw new AppValidationException("Cuenta no encontrada.");
+
+        account.PerformMonthEndTransactions();
+        _bankAccountRepository.Update(account);
+
+    }
 }

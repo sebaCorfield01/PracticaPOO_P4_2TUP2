@@ -7,7 +7,7 @@ public record MakeWithdrawalRequest(
     decimal Amount,
 
     [Required]
-    string Note,
+    string Notes,
 
     [Required]
     string Number

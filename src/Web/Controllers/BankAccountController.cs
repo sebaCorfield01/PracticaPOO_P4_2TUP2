@@ -3,11 +3,13 @@ using Web.Models;
 using Web.Models.Requests;
 using Core.Services;
 using Core.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class BankAccountController : ControllerBase
 {
    
@@ -16,9 +18,10 @@ public class BankAccountController : ControllerBase
     public BankAccountController(BankAccountService bankAccountService)
     {
         _bankAccountService = bankAccountService;
-       
+
     }
 
+    
     [HttpPost("create")]
     public ActionResult<BankAccountDto> CreateBankAccount([FromBody] CreateBankAccountRequest bankAccountDto)
     {
@@ -34,22 +37,23 @@ public class BankAccountController : ControllerBase
     [HttpPost("monthEnd")]
     public IActionResult PerformMonthEndForAccount([FromQuery] string accountNumber)
     {
-          _bankAccountService.PerformMonthEndForAccount(accountNumber);
+        _bankAccountService.PerformMonthEndForAccount(accountNumber);
         return NoContent();
     }
 
+    [AllowAnonymous]
     [HttpPost("deposit")]
     public IActionResult MakeDeposit([FromBody] MakeDepositRequest depositDto)
     {
 
-         _bankAccountService.MakeDeposit(
-                    depositDto.Amount,
-                    depositDto.Notes,
-                    depositDto.Number
-                );
+        _bankAccountService.MakeDeposit(
+                   depositDto.Amount,
+                   depositDto.Notes,
+                   depositDto.Number
+               );
         return NoContent();
     }
-
+    
     [HttpPost("withdrawal")]
     
      public IActionResult MakeWithdrawal([FromBody] MakeWithdrawalRequest withdrawalDto)

@@ -14,12 +14,37 @@ namespace Infrastructure.Data
         public DbSet<GiftCardAccount> giftCardAccounts { get; set; }
         public DbSet<InterestEarningAccount> interestEarningAccounts { get; set; }
 
-        public DbSet<Transaction> transactions {get; set;}
+        public DbSet<Transaction> transactions { get; set; }
+        public DbSet<User> Users { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
         }
-    }    
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().HasData(CreateUserDataSeed());
+
+            base.OnModelCreating(modelBuilder);
+        }
+
+        private User[] CreateUserDataSeed()
+        {
+            User[] result;
+
+            result = [
+            new User
+            {
+                UserName = "admin",
+                Email = "admin@hotmail.com",
+                FirstName = "Admin",
+                LastName = "1",
+                Phone = "123456789",
+                Id = 1
+            }];
+
+            return result;
+        }
+    }
 }
